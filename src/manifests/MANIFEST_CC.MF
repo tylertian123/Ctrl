@@ -1,0 +1,3 @@
+Manifest-Version: 1.0
+Main-Class: main.CtrlClient
+CtrlClient-Version: CCLIENT.VER.0027.0x19:CMD_INFOEX.NAMEFINDER_AUTO.2018.01.02
