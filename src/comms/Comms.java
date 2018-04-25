@@ -6,7 +6,7 @@ package comms;
  */
 public class Comms {
 	//Version Strings
-	public static final String CLIENTVER = "CCLIENT.VER.0027.0x19:CMD_INFOEX.NAMEFINDER_AUTO.2018.01.02";
+	public static final String CLIENTVER = "CCLIENT.VER.0028.0x19:CMD_INFOEX.SINGLE_INSTANCE.2018.04.25";
 	public static final String SERVERVER = "CSERVER.VER.0038.0x19:CMD_INFOEX.NULL.2018.01.02";
 
 	//Ports

@@ -1,43 +1,87 @@
 package main;
 
-import java.awt.Toolkit;
-import java.awt.Robot;
+import static comms.Comms.C9X_BSODAUTO;
+import static comms.Comms.C9X_BSODWIN10;
+import static comms.Comms.C9X_BSODWIN7;
+import static comms.Comms.C9X_FLICKER;
+import static comms.Comms.C9X_GPANEL;
+import static comms.Comms.C9X_KPLINUX;
+import static comms.Comms.C9X_KPMACOSX;
+import static comms.Comms.C9X_MBLOCKER;
+import static comms.Comms.CLIENTVER;
+import static comms.Comms.CMD_C9X;
+import static comms.Comms.CMD_FILE;
+import static comms.Comms.CMD_GETNAME;
+import static comms.Comms.CMD_GETVER;
+import static comms.Comms.CMD_INFO;
+import static comms.Comms.CMD_INFOEX;
+import static comms.Comms.CMD_INSERTSTR;
+import static comms.Comms.CMD_JVMNAME;
+import static comms.Comms.CMD_KILL;
+import static comms.Comms.CMD_LCLICK;
+import static comms.Comms.CMD_LDBLCLICK;
+import static comms.Comms.CMD_MCLICK;
+import static comms.Comms.CMD_MDOWN;
+import static comms.Comms.CMD_MMOVE;
+import static comms.Comms.CMD_MONITOR;
+import static comms.Comms.CMD_MUP;
+import static comms.Comms.CMD_PROTECT;
+import static comms.Comms.CMD_RAW;
+import static comms.Comms.CMD_RAWIN;
+import static comms.Comms.CMD_RCLICK;
+import static comms.Comms.CMD_RUNCMD;
+import static comms.Comms.CMD_RUNIN;
+import static comms.Comms.CMD_RUNPS;
+import static comms.Comms.CMD_RUNPSIN;
+import static comms.Comms.CMD_SETTIMEOUT;
+import static comms.Comms.CMD_SSHOT;
+import static comms.Comms.PORT;
+import static comms.Comms.RET_ERR;
+import static comms.Comms.RET_SUCCESS;
+
 import java.awt.AWTException;
 import java.awt.Rectangle;
+import java.awt.Robot;
+import java.awt.Toolkit;
 import java.awt.event.InputEvent;
 import java.awt.image.BufferedImage;
+import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.io.RandomAccessFile;
 import java.lang.management.ManagementFactory;
-import java.io.FileOutputStream;
-import java.io.ByteArrayOutputStream;
+import java.net.BindException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
 import java.net.Socket;
 import java.net.URISyntaxException;
-import java.net.DatagramSocket;
-import java.net.DatagramPacket;
-import java.net.InetAddress;
+import java.nio.channels.FileLock;
 import java.nio.file.Files;
 import java.rmi.UnknownHostException;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
+import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
-import java.util.jar.Attributes;
 
 import javax.imageio.ImageIO;
 
-import com.sun.jna.ptr.IntByReference;
 import com.sun.jna.platform.win32.Secur32;
+import com.sun.jna.ptr.IntByReference;
 
-import static comms.Comms.*;
-import c9x.*;
+import c9x.BSODFrame;
+import c9x.Flicker;
+import c9x.GlassPanel;
+import c9x.MouseBlocker;
 import monitor.MonitorClient;
 
 class ProtectService extends TimerTask {
@@ -81,6 +125,23 @@ public class CtrlClient {
 	static boolean protectActive = true;
 	static boolean copyActive = true;
 	static boolean isWindows;
+
+	static RandomAccessFile raf;
+	static FileLock singleInstanceLock;
+	static class ShutdownHook extends Thread {
+		@Override
+		public void run() {
+			try {
+				if(singleInstanceLock != null)
+					singleInstanceLock.release();
+				if(raf != null)
+					raf.close();
+			}
+			catch(IOException ioe) {
+				System.err.println("Error when trying to release file locks");
+			}
+		}
+	}
 	
 	static BufferedImage getScreenShot() {
 		return robot.createScreenCapture(screenRect);
@@ -946,7 +1007,12 @@ public class CtrlClient {
 			catch(UnknownHostException e) {
 				System.err.println("Unknown host");
 			}
+			catch(BindException e) {
+				System.out.println("Socket is already in use. The program will now exit.");
+				System.exit(0);
+			}
 			catch(IOException e) {
+				System.err.println("Unexpected Exception:");
 				e.printStackTrace();
 			}
 			finally {
